@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ProgressHUD
 
 class ListDishesViewController: UIViewController {
 
@@ -13,22 +14,30 @@ class ListDishesViewController: UIViewController {
     
     var category: DishCategory!
     
-    var dishes: [Dish] = [
-        .init(id: "1", name: "Ciorba", description: "Best soup you can try", image: "https://picsum.photos/100/200", calories: 35),
-        .init(id: "1", name: "Sarmale", description: "Rolled meat cabbage", image: "https://picsum.photos/100/200", calories: 350),
-        .init(id: "1", name: "Pizza", description: "As you're used to", image: "https://picsum.photos/100/200", calories: 325),
-        .init(id: "1", name: "Burger", description: "World meet juice", image: "https://picsum.photos/100/200", calories: 105)
-    ]
+    var dishes: [Dish] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = category.name
         registerCells()
+        
+        ProgressHUD.show()
+        NetworkManager.shared.fetchCategoryDishes(categoryId: category.id ?? " ") { [weak self] (result) in
+            switch result {
+            case .success(let dishes):
+                ProgressHUD.dismiss()
+                self?.dishes = dishes
+                self?.tableView.reloadData()
+            case .failure(let error):
+                ProgressHUD.showError(error.localizedDescription)
+            }
+        }
         // Do any additional setup after loading the view.
     }
     
     private func registerCells(){
         tableView.register(UINib(nibName: DishListTableViewCell.identifier, bundle: nil), forCellReuseIdentifier: DishListTableViewCell.identifier)
+        
     }
 
 

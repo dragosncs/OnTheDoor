@@ -2,7 +2,7 @@
 //  CategoryCollectionViewCell.swift
 //  OnTheDoor
 //
-//  Created by Dragos Neacsu on 13.10.2023.
+//  Created by Dragos Neacsu on 13/10/2023.
 //
 
 import UIKit
@@ -16,7 +16,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var categoryTitleLbl: UILabel!
     
     func setup(category: DishCategory) {
-//        categoryTitleLbl.text =  category.name
-//        categoryImageView.kf.setImage(with: category.image?.asUrl)
+        categoryTitleLbl.text = category.name
+        categoryImageView.kf.setImage(with: category.image?.asUrl)
     }
 }

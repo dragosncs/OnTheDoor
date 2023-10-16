@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ProgressHUD
 
 class HomeViewController: UIViewController {
     
@@ -16,32 +17,32 @@ class HomeViewController: UIViewController {
     
     @IBOutlet weak var specialsCollectionView: UICollectionView!
     
-    var categories: [DishCategory] = [
-         .init(id: "1", name: "Romanian Dish", image: "https://picsum.photos/100/200"),
-         .init(id: "2", name: "Romanian Dish2", image: "https://picsum.photos/100/200"),
-         .init(id: "3", name: "Romanian Dish3", image: "https://picsum.photos/100/200"),
-         .init(id: "4", name: "Romanian Dish4", image: "https://picsum.photos/100/200"),
-         .init(id: "5", name: "Romanian Dish5", image: "https://picsum.photos/100/200")
-    ]
+    var categories: [DishCategory] = []
     
-    var populars: [Dish] = [
-        .init(id: "1", name: "Ciorba", description: "Best soup you can try", image: "https://picsum.photos/100/200", calories: 35),
-        .init(id: "1", name: "Sarmale", description: "Rolled meat cabbage", image: "https://picsum.photos/100/200", calories: 350),
-        .init(id: "1", name: "Pizza", description: "As you're used to", image: "https://picsum.photos/100/200", calories: 325),
-        .init(id: "1", name: "Burger", description: "World meet juice", image: "https://picsum.photos/100/200", calories: 105)
-    ]
+    var populars: [Dish] = []
     
-    var specials: [Dish] = [
-        .init(id: "1", name: "Tocanita", description: "Best soup you can try", image: "https://picsum.photos/100/200", calories: 35),
-        .init(id: "1", name: "Piure", description: "Rolled meat cabbage", image: "https://picsum.photos/100/200", calories: 350),
-        .init(id: "1", name: "PorkBelly", description: "As you're used to", image: "https://picsum.photos/100/200", calories: 325),
-        .init(id: "1", name: "Burger", description: "World meet juice", image: "https://picsum.photos/100/200", calories: 105)
-    ]
+    var specials: [Dish] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         registerNib()
-
+        ProgressHUD.show()
+        NetworkManager.shared.fetchAllCategories { [weak self] (result) in
+            switch result {
+            case .success(let allDishes):
+                ProgressHUD.dismiss()
+                self?.categories = allDishes.categories ?? []
+                self?.populars = allDishes.populars ?? []
+                self?.specials = allDishes.specials ?? []
+                
+                self?.categoryCollectionView.reloadData()
+                self?.popularCollectionView.reloadData()
+                self?.specialsCollectionView.reloadData()
+            case .failure(let error):
+                ProgressHUD.showError(error.localizedDescription)
+            }
+        }
     }
     
     private func registerNib() {
